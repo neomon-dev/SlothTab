@@ -1,22 +1,23 @@
-export { Button } from "./button"
-export { Card } from "./card"
-export { CardContent } from "./card-content"
-export { Center } from "./center"
-export { Heading } from "./heading"
-export { Text } from "./text"
-export { Spinner } from "./spinner"
-export { Input } from "./input"
-export { Select } from "./select"
-export { Toggle } from "./toggle"
-export { Alert } from "./alert"
-export { Badge } from "./badge"
+import React from "react"
+
+export { Button } from "./ui/button"
+export { Card } from "./ui/card"
+export { Center } from "./ui/center"
+export { Heading } from "./ui/heading"
+export { Text } from "./ui/text"
+export { Spinner } from "./ui/spinner"
+export { Input } from "./ui/input"
+export { Select } from "./ui/select"
+export { Toggle } from "./ui/toggle"
+export { Alert } from "./ui/alert"
+export { Badge } from "./ui/badge"
 
 export const Box = ({
   className,
   children,
   ...props
 }: { className?: string; children?: React.ReactNode; [key: string]: unknown }) => (
-  <div className={className} {...props}>
+  <div className={className} {...(props as React.HTMLAttributes<HTMLDivElement>)}>
     {children}
   </div>
 )
@@ -30,4 +31,3 @@ export const CardContent = ({
     {children}
   </div>
 )
-import React from "react"

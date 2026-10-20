@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.responses import JSONResponse
 
-from .db import init_db, get_connection, get_settings, set_setting
+from .db import init_db, get_connection, get_settings, set_setting, get_settings_async, set_setting_async
 from .models import (
     FileInfo,
     AnalysisCreate,
@@ -43,8 +43,8 @@ router = APIRouter(prefix="/api", tags=["slothtab"])
 # --- Helper functions ---
 
 def get_workspace_base() -> str:
-    """Get the base workspace directory from settings or default to user downloads."""
-    settings = asyncio.get_event_loop().run_until_complete(get_settings())
+    """Get the base workspace directory from settings or default to user home."""
+    settings = get_settings()
     base = settings.get("workspace_base", os.path.expanduser("~"))
     return os.path.normpath(base)
 
@@ -87,14 +87,14 @@ async def health():
 async def get_settings_endpoint():
     """Get current settings."""
     from .db import get_settings as db_get_settings
-    return await db_get_settings()
+    return db_get_settings()
 
 
 @router.put("/settings", tags=["settings"])
 async def put_settings_endpoint(key: str, value: str):
     """Set a setting value."""
     from .db import set_setting as db_set_setting
-    return await db_set_setting(key, value)
+    return db_set_setting(key, value)
 
 
 @router.get("/files", tags=["files"])
@@ -122,8 +122,7 @@ async def list_files(
     
     for item in sorted(os.listdir(target)):
         item_path = os.path.join(target, item)
-        file_info = get_file_info(item_path)
-        
+
         if os.path.isdir(item_path):
             folders.append(
                 {
@@ -133,6 +132,7 @@ async def list_files(
                 }
             )
         else:
+            file_info = get_file_info(item_path)
             files.append(
                 {
                     "name": item,
@@ -174,17 +174,9 @@ async def analyze_file(
     
     extracted_text = ""
     if processor:
-        extracted_text, proc_error = extract_text_from_pdf.__wrapped__(
-            target
-        ) if "pdf" in processor else (
-            extract_text_from_docx.__wrapped__(target) if "docx" in processor else (
-                extract_text_from_txt.__wrapped__(target) if "txt" in processor else (
-                    extract_text_from_md.__wrapped__(target) if "md" in processor else (
-                        extract_text_from_image.__wrapped__(target) if "image" in processor else ""
-                    )
-                )
-            )
-        )
+        # processor is the actual callable returned by get_processor_for_file
+        extracted_text_result, proc_error = processor(target)
+        extracted_text = extracted_text_result or ""
     
     # If we have a provider, run AI analysis
     # Note: In a real app, we'd get the provider from settings

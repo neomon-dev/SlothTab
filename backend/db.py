@@ -118,6 +118,11 @@ def get_settings() -> Dict[str, Any]:
     return {row[0]: row[1] for row in rows}
 
 
+async def get_settings_async() -> Dict[str, Any]:
+    """Async wrapper around get_settings for use in async endpoints."""
+    return get_settings()
+
+
 def set_setting(key: str, value: str):
     """Set a setting value (upsert)."""
     conn = get_connection()
@@ -129,3 +134,8 @@ def set_setting(key: str, value: str):
     conn.commit()
     conn.close()
     return {"key": key, "value": value}
+
+
+async def set_setting_async(key: str, value: str):
+    """Async wrapper around set_setting for use in async endpoints."""
+    return set_setting(key, value)

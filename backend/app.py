@@ -34,26 +34,6 @@ app.include_router(router)
 FRONTEND_DIST = os.path.join(PROJECT_ROOT, "frontend", "dist")
 
 
-@app.get("/api/health", tags=["root"])
-async def health():
-    """Health check endpoint."""
-    return {"status": "ok", "message": "SlothTab is running"}
-
-
-@app.get("/api/settings", tags=["settings"])
-async def get_settings():
-    """Get current settings from storage."""
-    from .db import get_settings as db_get_settings
-    return await db_get_settings()
-
-
-@app.put("/api/settings", tags=["settings"])
-async def put_settings(key: str, value: str):
-    """Set a setting value."""
-    from .db import set_setting as db_set_setting
-    return await db_set_setting(key, value)
-
-
 @app.get("/{full_path:path}", include_in_schema=False)
 async def serve_frontend(full_path: str):
     """Serve the Vite build and support client-side routes in production."""

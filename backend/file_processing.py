@@ -24,8 +24,11 @@ def get_file_info(filepath: str) -> Dict[str, Any]:
     stat = os.stat(filepath)
     file_size = stat.st_size
 
-    # Compute hash
-    file_hash = compute_file_hash(filepath)
+    # Only hash regular files (not directories or special files)
+    if os.path.isfile(filepath):
+        file_hash = compute_file_hash(filepath)
+    else:
+        file_hash = ""
 
     # Get mime type
     mime_type, _ = mimetypes.guess_type(filepath)
