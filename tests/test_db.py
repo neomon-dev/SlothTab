@@ -2,7 +2,11 @@ import os
 import sys
 import tempfile
 
-sys.path.insert(0, '.')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PARENT_DIR = os.path.dirname(PROJECT_ROOT)
+for p in [PROJECT_ROOT, PARENT_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from slothtab.backend.db import init_db, get_connection, get_settings, set_setting
 
@@ -30,7 +34,7 @@ def test_db_initialization():
         assert required_tables.issubset(tables), f"Missing tables: {required_tables - tables}"
         
         conn.close()
-        print("✓ Database initialization test passed")
+        print("[PASS] Database initialization test passed")
         
     finally:
         db_module.DB_PATH = original_db_path
@@ -66,7 +70,7 @@ def test_settings_roundtrip():
         # Test deleting isn't directly supported, but we can overwrite
         set_setting('test_key', '')
         
-        print("✓ Settings roundtrip test passed")
+        print("[PASS] Settings roundtrip test passed")
         
     finally:
         db_module.DB_PATH = original_db_path
@@ -111,7 +115,7 @@ def test_file_operations():
         assert row[2] == 'test.pdf'
         
         conn.close()
-        print("✓ File operations test passed")
+        print("[PASS] File operations test passed")
         
     finally:
         db_module.DB_PATH = original_db_path
@@ -131,7 +135,7 @@ def test_duplicate_detection():
     # Note: compute_file_hash works on actual files, so we test the function exists
     assert callable(compute_file_hash)
     
-    print("✓ Duplicate detection test passed")
+    print("[PASS] Duplicate detection test passed")
 
 
 def test_filename_sanitization():
@@ -154,7 +158,7 @@ def test_filename_sanitization():
         assert '*' not in result and '?' not in result and '"' not in result
         assert '<' not in result and '>' not in result and '|' not in result
     
-    print("✓ Filename sanitization test passed")
+    print("[PASS] Filename sanitization test passed")
 
 
 if __name__ == '__main__':

@@ -1,5 +1,11 @@
+import os
 import sys
-sys.path.insert(0, '.')
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PARENT_DIR = os.path.dirname(PROJECT_ROOT)
+for p in [PROJECT_ROOT, PARENT_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from slothtab.backend.models import AnalysisCreate, SettingsResponse
 from slothtab.backend.ai_provider import create_provider
@@ -30,7 +36,7 @@ def test_analysis_create():
     assert analysis.reason == 'Test reason'
     assert analysis.file_id is None  # file_id is optional
     
-    print("✓ AnalysisCreate model test passed")
+    print("[PASS] AnalysisCreate model test passed")
 
 
 def test_analysis_create_minimal():
@@ -54,7 +60,7 @@ def test_analysis_create_minimal():
     assert analysis.reason is None
     assert analysis.file_id is None
     
-    print("✓ Minimal AnalysisCreate model test passed")
+    print("[PASS] Minimal AnalysisCreate model test passed")
 
 
 def test_settings_response():
@@ -73,7 +79,7 @@ def test_settings_response():
     assert settings.minimum_confidence == 0.9
     assert settings.auto_mode == False
     
-    print("✓ SettingsResponse model test passed")
+    print("[PASS] SettingsResponse model test passed")
 
 
 def test_ai_provider_creation():
@@ -90,7 +96,7 @@ def test_ai_provider_creation():
     provider = create_provider('openai_compatible', base_url='https://api.openai.com/v1')
     assert 'OpenAICompatible' in type(provider).__name__
     
-    print("✓ AI provider factory test passed")
+    print("[PASS] AI provider factory test passed")
 
 
 def test_sanitize_filename():
@@ -122,7 +128,7 @@ def test_sanitize_filename():
         # Should have some content
         assert len(result) > 0
     
-    print("✓ Filename sanitization test passed")
+    print("[PASS] Filename sanitization test passed")
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional, List, Dict, Any
 import re
 import os
@@ -18,8 +18,9 @@ class FileInfo(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
-    @validator("current_path", "original_path")
-    def must_be_filesystem_safe(cls, v):
+    @field_validator("current_path", "original_path")
+    @classmethod
+    def must_be_filesystem_safe(cls, v: str) -> str:
         """Validate path doesn't contain traversal sequences."""
         if ".." in v.split(os.sep):
             raise ValueError("Path traversal detected")
@@ -60,8 +61,7 @@ class AnalysisInDB(AnalysisBase):
     file_id: int
     created_at: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Operation models ---
@@ -85,8 +85,7 @@ class OperationInDB(OperationBase):
     timestamp: str
     undone: bool = False
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Settings models ---
@@ -150,8 +149,7 @@ class RuleInDB(RuleBase):
     id: int
     created_at: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- Response models ---

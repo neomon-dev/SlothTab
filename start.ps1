@@ -27,24 +27,30 @@ npm install --silent
 npm run build
 Set-Location $ROOT
 
-# --- 3. Launch backend via PM2 ---
+# --- 3. Launch backend ---
 New-Item -ItemType Directory -Force "$ROOT\logs" | Out-Null
-Write-Host "`n[3/3] Starting backend via PM2..." -ForegroundColor Yellow
-pm2 delete all --silent 2>$null
-pm2 start "$ROOT\ecosystem.config.cjs"
+Write-Host "`n[3/3] Starting backend..." -ForegroundColor Yellow
 
-Write-Host "`n✅ SlothTab is running!" -ForegroundColor Green
-Write-Host "   App: http://127.0.0.1:8000" -ForegroundColor White
-Write-Host ""
-Write-Host "   pm2 logs        → live log stream"
-Write-Host "   pm2 stop all    → stop everything"
-Write-Host "   pm2 delete all  → remove from PM2`n"
+if (Get-Command pm2 -ErrorAction SilentlyContinue) {
+    pm2 delete all --silent 2>$null
+    pm2 start "$ROOT\ecosystem.config.cjs"
+    Write-Host "`n✅ SlothTab is running via PM2!" -ForegroundColor Green
+    Write-Host "   App: http://127.0.0.1:8000" -ForegroundColor White
+    Write-Host "   pm2 logs        → live log stream"
+    Write-Host "   pm2 stop all    → stop everything"
+    Write-Host "   pm2 delete all  → remove from PM2`n"
+} else {
+    Start-Process python -ArgumentList "-m uvicorn backend.app:app --host 127.0.0.1 --port 8000" -WorkingDirectory $ROOT
+    Write-Host "`n✅ SlothTab is running via Python!" -ForegroundColor Green
+    Write-Host "   App: http://127.0.0.1:8000" -ForegroundColor White
+    Write-Host "   Run .\stop.ps1 to stop.`n"
+}
 
 # --- Optional: launch Vite dev server in a separate window ---
 if ($Dev) {
-  Write-Host "Starting frontend dev server (http://localhost:5173)..." -ForegroundColor Yellow
-  Start-Process powershell -ArgumentList "-NoExit", "-Command",
-    "Set-Location '$ROOT\frontend'; `$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); npm run dev"
+    Write-Host "Starting frontend dev server (http://localhost:5173)..." -ForegroundColor Yellow
+    Start-Process powershell -ArgumentList "-NoExit", "-Command",
+        "Set-Location '$ROOT\frontend'; `$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User'); npm run dev"
 }
 
 Start-Process "http://127.0.0.1:8000"

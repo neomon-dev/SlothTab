@@ -149,9 +149,37 @@ npm run dev
 
 The frontend runs on `http://localhost:5173`.
 
-### Docker deployment
+### 4. Direct / PM2 Deployment (No Docker)
 
-Docker provides the production-style setup: it builds the React frontend, serves it
+If Docker is not installed or you prefer running natively with automatic process management, use **PM2**:
+
+#### One-click script (PowerShell)
+
+```powershell
+.\start.ps1          # Installs dependencies, builds frontend, and starts via PM2
+.\stop.ps1           # Stops all services
+```
+
+#### Manual PM2 setup
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start all services
+pm2 start ecosystem.config.cjs
+
+# Useful commands
+pm2 logs             # View live logs
+pm2 stop all         # Stop processes
+pm2 delete all       # Clear PM2 process list
+```
+
+The application will be accessible at `http://127.0.0.1:8000`.
+
+### 5. Docker deployment
+
+Docker provides the containerized setup: it builds the React frontend, serves it
 from FastAPI, and persists the SQLite database in a named volume.
 
 ```bash
@@ -171,7 +199,7 @@ workspace base to `/workspace` in the app settings. Local AI providers such as
 LM Studio or Ollama must be reachable from the container; use a host address
 appropriate for your Docker runtime rather than `localhost`.
 
-### 4. LM Studio Setup
+### 6. LM Studio Setup
 
 1. Download and install [LM Studio](https://lmstudio.ai/)
 2. Open LM Studio and browse models
@@ -179,14 +207,14 @@ appropriate for your Docker runtime rather than `localhost`.
 4. Click "Start Server" to enable the local HTTP API
 5. Default endpoint: `http://localhost:1234/v1`
 
-### 5. Ollama Setup
+### 7. Ollama Setup
 
 1. Download and install [Ollama](https://ollama.com/)
 2. Pull a model: `ollama pull llama3:8b`
 3. Start the server (it auto-starts as a service)
 4. Default endpoint: `http://localhost:11434/v1`
 
-### 6. First Run
+### 8. First Run
 
 1. Open SlothTab in your browser
 2. Go to Settings → AI Provider
