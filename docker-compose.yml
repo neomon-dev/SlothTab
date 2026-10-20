@@ -1,0 +1,14 @@
+services:
+  slothtab:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+    volumes:
+      - slothtab-data:/app/data
+      - ${SLOTHTAB_WORKSPACE:-.}:/workspace
+    restart: unless-stopped
+
+volumes:
+  slothtab-data:
